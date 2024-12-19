@@ -1,0 +1,12 @@
+{{- if .Report -}}
+  {{- if gt (len .Updated) 0 -}}
+Updates are available for the following:
+  {{- range .Updated -}}
+- {{.Name}} ({{.ImageName}}): Updated from {{.CurrentImageID.ShortID}} to {{.LatestImageID.ShortID}}
+  {{- end -}}
+  {{- else -}}
+All containers are up to date!
+  {{- end -}}
+{{- else -}}
+No report generated.
+{{- end -}}
