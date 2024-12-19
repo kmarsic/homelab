@@ -1,8 +1,17 @@
 services:
   watchtower:
-    image: containrrr/watchtower
-    command:
-      - --cleanup=true
-    restart: always
+    image: containrrr/watchtower:latest
+    container_name: watchtower_monitor
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Zagreb
+      - WATCHTOWER_MONITOR_ONLY=true
+      - WATCHTOWER_SCHEDULE=* * 12 * * *
+      - WATCHTOWER_NOTIFICATION_URI=discord://Pv3WVZgGvtntXlI-li863Rp2rsNEOUhNW3x3PYoiTbLsaokCh9Q5WXOn6utdZLB8acg61313277705218691092
+      - WATCHTOWER_NOTIFICATION_TEMPLATE_PATH=/template/notification-template.txt
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./notification-template.txt:/template/notification-template.txt
+    network_mode: host
+    restart: always
