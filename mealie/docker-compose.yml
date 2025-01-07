@@ -1,0 +1,33 @@
+services:
+  mealie:
+    image: ghcr.io/mealie-recipes/mealie:latest
+    container_name: mealie
+    restart: always
+    ports:
+      - "9925:9000"
+    deploy:
+      resources:
+        limits:
+          memory: 1000M
+    volumes:
+      - mealie-data:/app/data/
+    environment:
+      - ALLOW_SIGNUP=true
+      - TZ=Europe/Zagreb
+      - MAX_WORKERS=1
+      - WEB_CONCURRENCY=1
+      - BASE_URL=https://mealie.kmphomelab.org
+    labels:
+      - docker-volume-backup.stop-during-backup=true
+  backup:
+    image: offen/docker-volume-backup:latest
+    restart: always
+    env_file: /home/kmarsic/volume_backup/backup.env
+    volumes:
+      - mealie-data:/backup/mealie-backup:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - mealie_backup:/archive
+volumes:
+  mealie-data:
+  mealie_backup:
+    external: true

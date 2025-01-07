@@ -1,0 +1,48 @@
+volumes:
+  nginx_backup:
+    external: true
+services:
+  app:
+    env_file: /home/kmarsic/nginx/.env
+    image: 'jc21/nginx-proxy-manager:latest'
+    user: "root:root"
+    restart: always
+    ports:
+      - '80:80'    # Public HTTP Port
+      - '443:443'  # Public HTTPS Port
+      - ${PORT}    # Admin Web Port
+    environment:
+      DB_MYSQL_HOST: "db"
+      DB_MYSQL_PORT: 3306
+      DB_MYSQL_USER: 'npm'
+      DB_MYSQL_PASSWORD: 'npm'
+      DB_MYSQL_NAME: "npm"
+    volumes:
+      - ./data:/data
+      - ./letsencrypt:/etc/letsencrypt
+    depends_on:
+      - db
+
+  db:
+    image: 'jc21/mariadb-aria:latest'
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'npm'
+      MYSQL_DATABASE: 'npm'
+      MYSQL_USER: 'npm'
+      MYSQL_PASSWORD: 'npm'
+    volumes:
+      - ./mysql:/var/lib/mysql
+    labels:
+      - docker-volume-backup.stop-during-backup=true
+  backup:
+    image: offen/docker-volume-backup:latest
+    user: "root:root"
+    restart: always
+    env_file: /home/kmarsic/volume_backup/backup.env
+    volumes:
+      - ./data:/backup/nginx-backup:ro
+      - ./letsencrypt:/backup/letsencrypt-backup:ro
+      - ./mysql:/backup/mysql-backup:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - nginx_backup:/archive

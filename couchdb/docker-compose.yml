@@ -1,0 +1,34 @@
+version: '3'
+services:
+  obsidian-sync:
+    container_name: obsidian-sync
+    image: couchdb:latest
+    env_file: /home/kmarsic/couchdb/.env
+    environment:
+      - TZ=Europe/Zagreb
+      - COUCHDB_USER=${DB_USER}
+      - COUCHDB_PASSWORD=${DB_PW}
+    volumes:
+      - /mnt/user/appdata/couchdb-obsidian-livesync/data:/opt/couchdb/data
+      - /mnt/user/appdata/couchdb-obsidian-livesync/etc/local.d:/opt/couchdb/etc/local.d
+    ports:
+      - "5984:5984"
+    restart: always
+    labels:
+      - net.unraid.docker.webui=http://[IP]:[PORT:5984]/_utils
+      - net.unraid.docker.icon=https://couchdb.apache.org/image/couch@2x.png
+      - net.unraid.docker.shell=bash
+      - docker-volume-backup.stop-during-backup=true
+
+  backup:
+    image: offen/docker-volume-backup:latest
+    restart: always
+    env_file: /home/kmarsic/volume_backup/backup.env
+    volumes:
+      - /mnt/user/appdata/couchdb-obsidian-livesync/data:/opt/couchdb/data
+      - /mnt/user/appdata/couchdb-obsidian-livesync/etc/local.d:/opt/couchdb/etc/local.d
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - obsidian_backup:/archive
+volumes:
+  obsidian_backup:
+    external: true
