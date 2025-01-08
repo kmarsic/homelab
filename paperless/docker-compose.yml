@@ -1,0 +1,75 @@
+services:
+  broker:
+    image: docker.io/library/redis:latest
+    restart: always
+    volumes:
+      - ./redisdata:/data
+
+  db:
+    image: docker.io/library/postgres:15
+    restart: always
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    env_file: /home/kmarsic/paperless/.env
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PW}
+    labels:
+      - docker-volume-backup.stop-during-backup=paperlessdb
+
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: always
+    depends_on:
+      - db
+      - broker
+      - gotenberg
+      - tika
+    ports:
+      - "8085:8000"
+    volumes:
+      - ./paperless_data:/usr/src/paperless/data
+      - ./paperless_media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - ./consume:/usr/src/paperless/consume
+    env_file: docker-compose.env
+    environment:
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+      PAPERLESS_DBUSER: ${DB_USER}
+      PAPERLESS_DBPASS: ${DB_PW}
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3050
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+
+  gotenberg:
+    image: docker.io/gotenberg/gotenberg:7.10
+    restart: always
+    command:
+      - "gotenberg"
+      - "--chromium-disable-javascript=true"
+      - "--api-port=3050"
+      - "--chromium-allow-list=file:///tmp/.*"
+    ports:
+      - "3050:3050"
+
+  tika:
+    image: ghcr.io/paperless-ngx/tika:latest
+    restart: always
+  backup:
+    image: offen/docker-volume-backup:latest
+    restart: always
+    env_file: /home/kmarsic/volume_backup/backup.env
+    volumes:
+      - ./export:/backup/export-backup:ro
+      - ./consume:/backup/consume-backup:ro
+      - ./paperless_data:/backup/data-backup:ro
+      - ./pgdata:/backup/pgdata-backup:ro
+      - ./redisdata:/backup/redisdata-backup:ro
+      - ./paperless_media:/backup/media-backup:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - paperless_backup:/archive
+volumes:
+  paperless_backup:
+    external: true
