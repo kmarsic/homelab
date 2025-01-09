@@ -32,7 +32,7 @@ services:
       - ./paperless_data:/usr/src/paperless/data
       - ./paperless_media:/usr/src/paperless/media
       - ./export:/usr/src/paperless/export
-      - ./consume:/usr/src/paperless/consume
+      - paperless_consume:/usr/src/paperless/consume
     env_file: docker-compose.env
     environment:
       PAPERLESS_REDIS: redis://broker:6379
@@ -63,7 +63,7 @@ services:
     env_file: /home/kmarsic/volume_backup/backup.env
     volumes:
       - ./export:/backup/export-backup:ro
-      - ./consume:/backup/consume-backup:ro
+      - paperless_consume:/backup/consume-backup:ro
       - ./paperless_data:/backup/data-backup:ro
       - ./pgdata:/backup/pgdata-backup:ro
       - ./redisdata:/backup/redisdata-backup:ro
@@ -72,4 +72,6 @@ services:
       - paperless_backup:/archive
 volumes:
   paperless_backup:
+    external: true
+  paperless_consume:
     external: true

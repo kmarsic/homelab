@@ -25,8 +25,8 @@ services:
     restart: always
     env_file: /home/kmarsic/volume_backup/backup.env
     volumes:
-      - /mnt/user/appdata/couchdb-obsidian-livesync/data:/opt/couchdb/data
-      - /mnt/user/appdata/couchdb-obsidian-livesync/etc/local.d:/opt/couchdb/etc/local.d
+      - /mnt/user/appdata/couchdb-obsidian-livesync/data:/backup/data:ro
+      - /mnt/user/appdata/couchdb-obsidian-livesync/etc/local.d:/backup/local.d:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - obsidian_backup:/archive
 volumes:
