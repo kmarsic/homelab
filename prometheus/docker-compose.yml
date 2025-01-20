@@ -4,11 +4,33 @@ services:
     container_name: prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.config.file=/etc/prometheus/web.yml'
     ports:
       - 9099:9090
     restart: always
     volumes:
       - ./prometheus:/etc/prometheus
       - prom_data:/prometheus
+    depends_on:
+      - cadvisor
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    command:
+      - privileged=true
+    ports:
+    - 9098:8080
+    volumes:
+    - /:/rootfs:ro
+    - /var/run:/var/run:rw
+    - /sys:/sys:ro
+#    - /var/lib/docker/:/var/lib/docker:ro
+    depends_on:
+    - redis
+  redis:
+    image: redis:latest
+    container_name: redis
+    ports:
+    - 6379:6379
 volumes:
   prom_data:
