@@ -1,0 +1,104 @@
+services:
+  radarr:
+    container_name: radarr
+    image: ghcr.io/hotio/radarr:latest
+    restart: always
+    logging:
+      driver: json-file
+    ports:
+      - 7878:7878
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Zagreb
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/kmarsic/starr/radarr:/config
+      - arr_vol:/data
+  sonarr:
+    container_name: sonarr
+    image: ghcr.io/hotio/sonarr:latest
+    restart: always
+    logging:
+      driver: json-file
+    ports:
+      - 8989:8989
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Zagreb
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/kmarsic/starr/sonarr:/config
+      - arr_vol:/data
+  bazarr:
+    container_name: bazarr
+    image: ghcr.io/hotio/bazarr:latest
+    restart: always
+    logging:
+      driver: json-file
+    ports:
+      - 6767:6767
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Zagreb
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/kmarsic/starr/bazarr:/config
+      - media_data:/data/media
+  sabnzbd:
+    container_name: sabnzbd
+    image: ghcr.io/hotio/sabnzbd:latest
+    restart: always
+    logging:
+      driver: json-file
+    ports:
+      - 8090:8080
+      - 9090:9090
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Zagreb
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /home/kmarsic/starr/sabnzbd:/config
+      - usenet_data:/data/usenet:rw
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Zagreb
+      - WEBUI_PORT=8080
+      - TORRENTING_PORT=6881
+    volumes:
+      - /home/kmarsic/starr/qbittorrent:/config
+      - torrent_data:/downloads #optional
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    restart: always
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Europe/Zagreb
+    volumes:
+      - /home/kmarsic/starr/prowlarr:/config
+    ports:
+      - 9696:9696
+    restart: always
+volumes:
+  arr_vol:
+    external: true
+  torrent_data:
+    external: true
+  usenet_data:
+    external: true
+  media_data:
+    external: true
