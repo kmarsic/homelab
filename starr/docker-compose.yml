@@ -75,7 +75,7 @@ services:
       - TORRENTING_PORT=6881
     volumes:
       - /home/kmarsic/starr/qbittorrent:/config
-      - torrent_data:/downloads #optional
+      - torrent_data:/data/torrents #optional
     ports:
       - 8080:8080
       - 6881:6881
