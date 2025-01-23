@@ -1,0 +1,9 @@
+services:
+  linkding:
+    container_name: linkding
+    image: sissbruecker/linkding:latest
+    ports:
+      - "12090:9090"
+    volumes:
+      - /home/kmarsic/linkding/data:/etc/linkding/data
+    restart: always
