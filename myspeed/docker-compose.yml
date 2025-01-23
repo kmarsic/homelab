@@ -1,0 +1,9 @@
+services:
+  myspeed:
+    ports:
+      - '5216:5216'
+    volumes:
+      - ./data:/myspeed/data
+    restart: always
+    container_name: MySpeed
+    image: 'germannewsmaker/myspeed:latest'

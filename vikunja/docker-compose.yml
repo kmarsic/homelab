@@ -1,0 +1,31 @@
+services:
+    vikunja:
+        image: vikunja/vikunja
+        env_file: /home/kmarsic/vikunja/.env
+        environment:
+            VIKUNJA_SERVICE_PUBLICURL: https://vikunja.kmphomelab.org
+            VIKUNJA_DATABASE_HOST: db
+            VIKUNJA_DATABASE_PASSWORD: ${DB_PW}
+            VIKUNJA_DATABASE_TYPE: mysql
+            VIKUNJA_DATABASE_USER: ${DB_USER}
+            VIKUNJA_DATABASE_DATABASE: vikunja
+            VIKUNJA_SERVICE_JWTSECRET: furry
+        ports:
+            - 3456:3456
+        volumes:
+            - ./files:/app/vikunja/files
+        depends_on:
+            - db
+        restart: always
+    db:
+        image: mariadb:10
+        command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+        env_file: /home/kmarsic/vikunja/.env
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_ROOT}
+            MYSQL_USER: ${DB_USER}
+            MYSQL_PASSWORD: ${DB_PW}
+            MYSQL_DATABASE: vikunja
+        volumes:
+            - ./db:/var/lib/mysql
+        restart: always
