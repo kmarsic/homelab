@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # === Load environment variables ===
-ENV_FILE="/opt/homelab_git/.env"
+ENV_FILE="/opt/docker/homelab/scripts/.env"
 if [ -f "$ENV_FILE" ]; then
     # shellcheck disable=SC1090
     source "$ENV_FILE"
@@ -11,8 +11,8 @@ else
 fi
 
 # === Configuration ===
-SOURCE_DIR="/opt/docker"
-TARGET_DIR="/opt/homelab_git"
+SOURCE_DIR="/opt/docker/stacks"
+TARGET_DIR="/opt/docker/homelab"
 LOG_FILE="/var/log/homelab_sync.log"
 TIMESTAMP=$(date +"%Y-%m-%d %H:%M:%S")
 
