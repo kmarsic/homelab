@@ -1,0 +1,36 @@
+services:
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+    restart: always
+    volumes:
+      - ./prometheus:/etc/prometheus
+      - prom_data:/prometheus
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - grafana-storage:/var/lib/grafana
+  graphite-exporter:
+    image: prom/graphite-exporter:latest
+    container_name: graphite-exporter
+    ports:
+      - 9108:9108 # Prometheus metrics endpoint
+      - 9109:9109 # Graphite plaintext receiver (TCP)
+      - 9109:9109/udp # Graphite plaintext receiver (UDP)
+    command:
+      - --graphite.mapping-config=/tmp/graphite_mapping.conf
+    volumes:
+      - ./graphite.conf:/tmp/graphite_mapping.conf:ro
+    restart: unless-stopped
+volumes:
+  grafana-storage: {}
+  prom_data: {}
+networks: {}

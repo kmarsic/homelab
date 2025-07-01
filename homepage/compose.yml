@@ -1,0 +1,13 @@
+services:
+  homepage:
+    image: ghcr.io/gethomepage/homepage:latest
+    container_name: homepage
+    restart: unless-stopped
+    ports:
+      - 3050:3000
+    volumes:
+      - ./config:/app/config
+    environment:
+      HOMEPAGE_ALLOWED_HOSTS: kmphomelab.org
+      PUID: 1000
+      PGID: 1000

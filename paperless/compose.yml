@@ -1,0 +1,59 @@
+services:
+  broker:
+    image: redis:latest
+    restart: unless-stopped
+    labels:
+      wud.trigger.include: discord.discord,dockercompose.paperless
+    volumes:
+      - ./redisdata:/data
+  db:
+    image: postgres:15
+    restart: unless-stopped
+    labels:
+      wud.trigger.include: discord.discord
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: paperless
+      POSTGRES_USER: paperless
+      POSTGRES_PASSWORD: paperless
+  webserver:
+    image: ghcr.io/paperless-ngx/paperless-ngx:latest
+    restart: unless-stopped
+    labels:
+      wud.trigger.include: discord.discord,dockercompose.paperless
+    depends_on:
+      - db
+      - broker
+      - gotenberg
+      - tika
+    ports:
+      - 8010:8000
+    volumes:
+      - ./data:/usr/src/paperless/data
+      - ./media:/usr/src/paperless/media
+      - ./export:/usr/src/paperless/export
+      - /mnt/consume:/usr/src/paperless/consume
+    env_file: compose.env
+    environment:
+      PAPERLESS_CONSUMER_POLLING: 30
+      PAPERLESS_REDIS: redis://broker:6379
+      PAPERLESS_DBHOST: db
+      PAPERLESS_TIKA_ENABLED: 1
+      PAPERLESS_TIKA_GOTENBERG_ENDPOINT: http://gotenberg:3000
+      PAPERLESS_TIKA_ENDPOINT: http://tika:9998
+  gotenberg:
+    image: gotenberg/gotenberg:8.21.1
+    restart: unless-stopped
+    labels:
+      wud.trigger.include: discord.discord,dockercompose.paperless
+    command:
+      - gotenberg
+      - --chromium-disable-javascript=true
+      - --chromium-allow-list=file:///tmp/.*
+  tika:
+    image: ghcr.io/paperless-ngx/tika:latest
+    restart: unless-stopped
+    labels:
+      wud.trigger.include: discord.discord,dockercompose.paperless
+networks: {}

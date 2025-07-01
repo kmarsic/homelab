@@ -1,0 +1,83 @@
+services:
+  sonarr:
+    image: ghcr.io/hotio/sonarr:latest
+    container_name: sonarr
+    labels:
+      wud.trigger.include: discord.discord,dockercompose.starr
+    ports:
+      - 8989:8989
+    environment:
+      TZ: Europe/Zagreb
+    volumes:
+      - ./config/sonarr:/config
+      - /mnt/media:/data
+    restart: unless-stopped
+  radarr:
+    image: ghcr.io/hotio/radarr:latest
+    container_name: radarr
+    labels:
+      wud.trigger.include: discord.discord,dockercompose.starr
+    ports:
+      - 7878:7878
+    environment:
+      TZ: Europe/Zagreb
+    volumes:
+      - ./config/radarr:/config
+      - /mnt/media:/data
+    restart: unless-stopped
+  prowlarr:
+    image: lscr.io/linuxserver/prowlarr:latest
+    container_name: prowlarr
+    labels:
+      wud.trigger.include: discord.discord,dockercompose.starr
+    environment:
+      TZ: Etc/Zagreb
+    volumes:
+      - ./config/prowlarr:/config
+    ports:
+      - 9696:9696
+    restart: unless-stopped
+  qbittorrent:
+    image: lscr.io/linuxserver/qbittorrent:latest
+    container_name: qbittorrent
+    labels:
+      wud.trigger.include: discord.discord,dockercompose.starr
+    environment:
+      TZ: Europe/Zagreb
+      WEBUI_PORT: 8090
+      TORRENTING_PORT: 6881
+    volumes:
+      - ./config/qbittorrent:/config
+      - /mnt/media/torrents:/data/torrents
+    ports:
+      - 8090:8090
+      - 6881:6881
+      - 6881:6881/udp
+    restart: unless-stopped
+  sabnzbd:
+    image: ghcr.io/hotio/sabnzbd
+    container_name: sabnzbd
+    labels:
+      wud.trigger.include: discord.discord,dockercompose.starr
+    ports:
+      - 8080:8080
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Zagreb
+    volumes:
+      - ./config/sabnzbd:/config
+      - /mnt/media/usenet:/data/usenet
+    restart: unless-stopped
+  recyclarr:
+    image: ghcr.io/recyclarr/recyclarr
+    container_name: recyclarr
+    labels:
+      wud.trigger.include: discord.discord,dockercompose.starr
+    environment:
+      PUID: 1000
+      PGID: 1000
+      TZ: Europe/Zagreb
+    volumes:
+      - ./config/recyclarr:/config
+networks: {}

@@ -1,0 +1,24 @@
+services:
+  whatsupdocker:
+    image: getwud/wud
+    container_name: wud
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /opt/docker/stacks/nginx/compose.yml:/wud/nginx/compose.yml
+      - /opt/docker/stacks/starr/compose.yml:/wud/starr/compose.yml
+      - /opt/docker/stacks/paperless/compose.yml:/wud/paperless/compose.yml
+    ports:
+      - 3030:3000
+    environment:
+      - WUD_TRIGGER_DISCORD_DISCORD_URL=https://discordapp.com/api/webhooks/1326256453618765925/8V6beXIvHCmC-_j-Xjo-TvT9rayHeJ4zxIUpEmqJgchrWLOrdjwykqku9cHHkoXl8ewm
+      - WUD_TRIGGER_DOCKERCOMPOSE_NGINX_FILE=/wud/nginx/compose.yml
+      - WUD_TRIGGER_DOCKERCOMPOSE_NGINX_PRUNE=true
+      - WUD_TRIGGER_DOCKERCOMPOSE_NGINX_AUTO=false
+      - WUD_TRIGGER_DOCKERCOMPOSE_STARR_FILE=/wud/starr/compose.yml
+      - WUD_TRIGGER_DOCKERCOMPOSE_STARR_PRUNE=true
+      - WUD_TRIGGER_DOCKERCOMPOSE_STARR_AUTO=false
+      - WUD_TRIGGER_DOCKERCOMPOSE_PAPERLESS_FILE=/wud/starr/compose.yml
+      - WUD_TRIGGER_DOCKERCOMPOSE_PAPERLESS_PRUNE=true
+      - WUD_TRIGGER_DOCKERCOMPOSE_PAPERLESS_AUTO=false
+      - WUD_TRIGGER_DOCKER_AUTO_PRUNE=true
+networks: {}
