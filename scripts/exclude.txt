@@ -1,0 +1,9 @@
+data/
+media/
+export/
+mnt/
+pgdata/
+redisdata/
+mysql/
+letsencrypt/
+config/
